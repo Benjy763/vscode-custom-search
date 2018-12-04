@@ -1,6 +1,6 @@
 {
-    "name": "migration-state",
-    "displayName": "migration-state",
+    "name": "custom-search",
+    "displayName": "custom-search",
     "description": "Provide statistics about the Angular migration state of your app",
     "version": "0.0.1",
     "publisher": "Benjy763",
@@ -18,7 +18,7 @@
         "commands": [
             {
                 "command": "extension.generateReport",
-                "title": "Generate migration state"
+                "title": "Generate search report"
             }
         ]
     },
