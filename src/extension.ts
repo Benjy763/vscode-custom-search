@@ -1,20 +1,23 @@
 'use strict';
 import * as vscode from 'vscode';
+import { FileUtils } from './file-utils';
 
 export function activate(context: vscode.ExtensionContext) {
 
     let output: vscode.OutputChannel = vscode.window.createOutputChannel('report');
     let exclusions: any;
     let filesPatterns: any[] = [];
+    let filesUtils: FileUtils = new FileUtils();
     console.log('The extention "custom-search" is active');
     output.append('Waiting for results...\n');
     output.show();
 
     async function getConfiguration(): Promise<boolean> {
         try {
-            const config: vscode.TextDocument =
-                await vscode.workspace.openTextDocument(vscode.workspace.rootPath+'\\custom-search.json');
-            const parsedConfig = JSON.parse(config.getText());
+            const config: any =
+                await filesUtils.readFile(vscode.workspace.rootPath+'\\custom-search.json');
+
+            const parsedConfig = JSON.parse(config);
             filesPatterns = parsedConfig.filesPatterns;
             exclusions = parsedConfig.exclusionPatterns;
             if(exclusions.indexOf('node_modules') === -1) {
@@ -65,18 +68,20 @@ export function activate(context: vscode.ExtensionContext) {
             // Add all promises relative to opened documents
             const fileContentPromises: any[] = [];
             files.forEach((uri: any) =>{
-                fileContentPromises.push(vscode.workspace.openTextDocument(uri));
+                fileContentPromises.push(filesUtils.readFile(uri.fsPath ));
             });
             fileAnnotationSearches.push(Promise.all(fileContentPromises));
         });
 
         // Resolve all opened document and loop to search into them with annotationPattern from config
-        (await Promise.all(fileAnnotationSearches)).forEach((openDocuments: vscode.TextDocument[], index: number) => {
+        (await Promise.all(fileAnnotationSearches)).forEach((openDocuments: any, index: number) => {
             if (!openDocuments) {
                 return;
             }
-            openDocuments.forEach((openDocument: vscode.TextDocument) => {
-                const fileContentMatches = openDocument.getText().match(new RegExp(filesPatterns[index].annotationPattern, 'g'));
+            openDocuments.forEach((openDocument: any) => {
+                console.log(openDocument.toString('utf8'));
+                const fileContentMatches = openDocument.toString('utf8')
+                    .match(new RegExp(filesPatterns[index].annotationPattern, 'g'));
                 // Increment a result when finding a match
                 filesPatterns[index].number += fileContentMatches ? fileContentMatches.length : 0;
             });
