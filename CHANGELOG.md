@@ -1,3 +1,6 @@
+# 0.1.3 - 2018-05-12
+- Improvement of performances
+
 # 0.1.2 - 2018-04-12
 - Possibility to add exclusions pattern in configuration
 - Maj readme
